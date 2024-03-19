@@ -26,7 +26,7 @@ class TextEditorBase(tk.Tk):
         icon = ImageTk.PhotoImage(Image.open(image_path))
         self.iconphoto(False, icon)
 
-        self.text = tk.Text(self, wrap="none")
+        self.text = tk.Text(self, font=('Times New Roman', 12), wrap="none")
         self.text.grid(row=0, column=0, sticky="nsew")
 
         # Vertical Scroll bar
