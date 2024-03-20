@@ -3,10 +3,10 @@
 
 import tkinter as tk
 from tkinter import ttk
-import tkinter.filedialog
 import os
 from PIL import Image, ImageTk
 from hashlib import md5
+import menu_option
 
 
 class Tab(ttk.Frame):
@@ -93,6 +93,26 @@ class TextEditorBase(ttk.Notebook):
         self.add(tab, text=f"Tab {self.index('end')}")
 
 
+def create_menu(root, editor):
+    menubar = tk.Menu(root)
+    file_menu = tk.Menu(menubar, tearoff=0)
+    file_menu.add_command(label="New",
+                          command=lambda: menu_option.new_file(editor))
+    file_menu.add_command(label="Open",
+                          command=lambda: menu_option.open_file(editor))
+    file_menu.add_command(label="Save",
+                          command=lambda: menu_option.save_file(editor))
+    file_menu.add_command(label="Save As...",
+                          command=lambda: menu_option.save_as(editor))
+    file_menu.add_command(label="Close",
+                          command=lambda: menu_option.close_tab(editor))
+    file_menu.add_separator()
+    file_menu.add_command(label="Exit",
+                          command=lambda: menu_option.exit_editor(root))
+    menubar.add_cascade(label="File", menu=file_menu)
+    root.config(menu=menubar)
+
+
 def run():
     """Run the windows"""
     root = tk.Tk()
@@ -103,6 +123,8 @@ def run():
     # Notebook widget to manage multiple tabs
     editor = TextEditorBase(root)
     editor.pack(fill="both", expand=True)
+
+    create_menu(root, editor)
 
     root.mainloop()
 
