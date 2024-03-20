@@ -46,18 +46,11 @@ class Tab(ttk.Frame):
         return textbox
 
 
-class TextEditorBase(tk.Tk):
+class TextEditorBase(ttk.Notebook):
     """Base class TextEditorBase defines basic setup for the GUI"""
     def __init__(self, *args, **kwargs):
         """Class construct"""
         super().__init__(*args, **kwargs)
-        self.title('PyC Text Editor')
-        self.geometry('800x500')
-        self.resizable(1, 1)
-
-        # Notebook widget to manage multiple tabs
-        self.notebook = ttk.Notebook(self)
-        self.notebook.pack(fill="both", expand=True)
 
         # Add a default tab
         self.add_tab()
@@ -67,17 +60,50 @@ class TextEditorBase(tk.Tk):
         image_path = os.path.join(current_dir, 'PyC.png')
 
         icon = ImageTk.PhotoImage(Image.open(image_path))
-        self.iconphoto(False, icon)
+        self.master.iconphoto(False, icon)
+
+        self.enable_traversal()
+        self.bind("<B1-Motion>", self.move_tab)
+
+    # Get the object of the current tab
+    def current_tab(self):
+        return self.nametowidget(self.select())
+
+    def indexed_tab(self, index):
+        return self.nametowidget(self.tabs()[index])
+
+    # Move tab position by dragging tab
+    def move_tab(self, event):
+        """Check if there is more than one tab
+            Use the y-coordinate of the current tab so that if the user
+            moves the mouse up / down out of the range of the tabs,
+            the left / right movement still moves the tab.
+        """
+        if self.index("end") > 1:
+            y = self.current_tab().winfo_y() - 5
+            try:
+                self.insert(min(event.widget.index('@%d,%d' % (event.x, y)),
+                                self.index('end') - 2), self.select())
+            except tk.TclError:
+                pass
 
     def add_tab(self):
         """Add a new tab to the Notebook"""
-        tab = Tab(self.notebook)
-        self.notebook.add(tab, text=f"Tab {self.notebook.index('end')}")
+        tab = Tab(self)
+        self.add(tab, text=f"Tab {self.index('end')}")
 
 
 def run():
     """Run the windows"""
-    root = TextEditorBase()
+    root = tk.Tk()
+    root.title('PyC Text Editor')
+    root.geometry('800x500')
+    root.resizable(1, 1)
+
+    # Notebook widget to manage multiple tabs
+    editor = TextEditorBase(root)
+    editor.pack(fill="both", expand=True)
+
     root.mainloop()
 
 
