@@ -38,10 +38,23 @@ def save_as(editor):
             file.write(content)
 
 
+def save_all(editor):
+    for tab_id in editor.tabs():
+        tab = editor.nametowidget(tab_id)
+        if tab.file_dir:
+            content = tab.textbox.get('1.0', tk.END)
+            with open(tab.file_dir, 'w') as file:
+                file.write(content)
+        else:
+            save_as(editor)
+
+
 def close_tab(editor):
     current_index = editor.index(editor.select())
     if current_index != 0:
         editor.forget(current_index)
+    else:
+        exit_editor(editor)
 
 
 def exit_editor(root):
