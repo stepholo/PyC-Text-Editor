@@ -65,6 +65,15 @@ class TextEditorBase(ttk.Notebook):
         self.enable_traversal()
         self.bind("<B1-Motion>", self.move_tab)
 
+        # File types for file dialogs
+        self.filetypes = (("Normal text file", "*.txt"), ("all files", "*.*"))
+
+        # Initial directory for file dialogs
+        self.init_dir = os.path.join(os.path.expanduser('~'), 'Desktop')
+
+        # Counter for untitled files
+        self.untitled_count = 1
+
     # Get the object of the current tab
     def current_tab(self):
         return self.nametowidget(self.select())
@@ -96,26 +105,37 @@ class TextEditorBase(ttk.Notebook):
 def create_menu(root, editor):
     menubar = tk.Menu(root)
     file_menu = tk.Menu(menubar, tearoff=0)
-    file_menu.add_command(label="New tab",
+    file_menu.add_command(label="New tab    Ctrl+N",
                           command=lambda: menu_option.new_file(editor))
-    file_menu.add_command(label="Open",
+    file_menu.add_command(label="Open         Ctrl+O",
                           command=lambda: menu_option.open_file(editor))
-    file_menu.add_command(label="Save",
+    file_menu.add_command(label="Save          Ctrl+S",
                           command=lambda: menu_option.save_file(editor))
-    file_menu.add_command(label="Save As...",
+    file_menu.add_command(label="Save As      Ctrl+Shift+S",
                           command=lambda: menu_option.save_as(editor))
-    file_menu.add_command(label="Save All",
+    file_menu.add_command(label="Save All     Ctrl+A",
                           command=lambda: menu_option.save_all(editor))
     file_menu.add_separator()
-    file_menu.add_command(label="Close tab",
+    file_menu.add_command(label="Close tab  Ctrl+W",
                           command=lambda: menu_option.close_tab(editor))
-    file_menu.add_command(label="Close Window",
+    file_menu.add_command(label="Close Window   Ctrl+Shift+W",
                           command=lambda: close_window(root))
     file_menu.add_separator()
-    file_menu.add_command(label="Exit",
+    file_menu.add_command(label="Exit   Ctrl+Q",
                           command=lambda: menu_option.exit_editor(root))
     menubar.add_cascade(label="File", menu=file_menu)
     root.config(menu=menubar)
+
+    # Keyboard bindings
+    root.bind_all("<Control-n>", lambda event: menu_option.new_file(editor))
+    root.bind_all("<Control-o>", lambda event: menu_option.open_file(editor))
+    root.bind_all("<Control-s>", lambda event: menu_option.save_file(editor))
+    root.bind_all("<Control-Shift-S>", lambda event:
+                  menu_option.save_as(editor))
+    root.bind_all("<Control-a>", lambda event: menu_option.save_all(editor))
+    root.bind_all("<Control-w>", lambda event: menu_option.close_tab(editor))
+    root.bind_all("<Control-Shift-W>", lambda event: close_window(editor))
+    root.bind_all("<Control-q>", lambda event: menu_option.exit_editor(root))
 
 
 def close_window(root):
