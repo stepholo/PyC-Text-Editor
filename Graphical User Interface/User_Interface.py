@@ -6,7 +6,7 @@ from tkinter import ttk
 import os
 from PIL import Image, ImageTk
 from hashlib import md5
-import menu_option
+from menu_option import create_menu
 
 
 class Tab(ttk.Frame):
@@ -100,46 +100,6 @@ class TextEditorBase(ttk.Notebook):
         """Add a new tab to the Notebook"""
         tab = Tab(self)
         self.add(tab, text=f"Tab {self.index('end')}")
-
-
-def create_menu(root, editor):
-    menubar = tk.Menu(root)
-    file_menu = tk.Menu(menubar, tearoff=0)
-    file_menu.add_command(label="New tab    Ctrl+N",
-                          command=lambda: menu_option.new_file(editor))
-    file_menu.add_command(label="Open         Ctrl+O",
-                          command=lambda: menu_option.open_file(editor))
-    file_menu.add_command(label="Save          Ctrl+S",
-                          command=lambda: menu_option.save_file(editor))
-    file_menu.add_command(label="Save As      Ctrl+Shift+S",
-                          command=lambda: menu_option.save_as(editor))
-    file_menu.add_command(label="Save All     Ctrl+A",
-                          command=lambda: menu_option.save_all(editor))
-    file_menu.add_separator()
-    file_menu.add_command(label="Close tab  Ctrl+W",
-                          command=lambda: menu_option.close_tab(editor))
-    file_menu.add_command(label="Close Window   Ctrl+Shift+W",
-                          command=lambda: close_window(root))
-    file_menu.add_separator()
-    file_menu.add_command(label="Exit   Ctrl+Q",
-                          command=lambda: menu_option.exit_editor(root))
-    menubar.add_cascade(label="File", menu=file_menu)
-    root.config(menu=menubar)
-
-    # Keyboard bindings
-    root.bind_all("<Control-n>", lambda event: menu_option.new_file(editor))
-    root.bind_all("<Control-o>", lambda event: menu_option.open_file(editor))
-    root.bind_all("<Control-s>", lambda event: menu_option.save_file(editor))
-    root.bind_all("<Control-Shift-S>", lambda event:
-                  menu_option.save_as(editor))
-    root.bind_all("<Control-a>", lambda event: menu_option.save_all(editor))
-    root.bind_all("<Control-w>", lambda event: menu_option.close_tab(editor))
-    root.bind_all("<Control-Shift-W>", lambda event: close_window(editor))
-    root.bind_all("<Control-q>", lambda event: menu_option.exit_editor(root))
-
-
-def close_window(root):
-    root.destroy()
 
 
 def run():
