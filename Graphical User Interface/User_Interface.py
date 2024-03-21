@@ -96,7 +96,7 @@ class TextEditorBase(ttk.Notebook):
 def create_menu(root, editor):
     menubar = tk.Menu(root)
     file_menu = tk.Menu(menubar, tearoff=0)
-    file_menu.add_command(label="New",
+    file_menu.add_command(label="New tab",
                           command=lambda: menu_option.new_file(editor))
     file_menu.add_command(label="Open",
                           command=lambda: menu_option.open_file(editor))
@@ -104,13 +104,22 @@ def create_menu(root, editor):
                           command=lambda: menu_option.save_file(editor))
     file_menu.add_command(label="Save As...",
                           command=lambda: menu_option.save_as(editor))
-    file_menu.add_command(label="Close",
+    file_menu.add_command(label="Save All",
+                          command=lambda: menu_option.save_all(editor))
+    file_menu.add_separator()
+    file_menu.add_command(label="Close tab",
                           command=lambda: menu_option.close_tab(editor))
+    file_menu.add_command(label="Close Window",
+                          command=lambda: close_window(root))
     file_menu.add_separator()
     file_menu.add_command(label="Exit",
                           command=lambda: menu_option.exit_editor(root))
     menubar.add_cascade(label="File", menu=file_menu)
     root.config(menu=menubar)
+
+
+def close_window(root):
+    root.destroy()
 
 
 def run():
