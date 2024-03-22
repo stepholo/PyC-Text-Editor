@@ -7,6 +7,8 @@ import tkinter as tk
 
 def create_menu(root, editor):
     menubar = tk.Menu(root)
+
+    # File Menu
     file_menu = tk.Menu(menubar, tearoff=0)
     file_menu.add_command(label="New tab    Ctrl+N",
                           command=lambda: new_file(editor))
@@ -29,7 +31,47 @@ def create_menu(root, editor):
     menubar.add_cascade(label="File", menu=file_menu)
     root.config(menu=menubar)
 
-    # Keyboard bindings
+    # Edit Menu
+    editmenu = tk.Menu(menubar, tearoff=0)
+    editmenu.add_command(
+        label="Undo     Ctrl+Z",
+        command=lambda: editor.current_tab().textbox.edit_undo(),
+        state='normal'
+        )
+    editmenu.add_separator()
+    editmenu.add_command(
+        label="Copy     Ctrl+C",
+        command=lambda:
+        editor.current_tab().textbox.event_generate("<<Copy>>"),
+        state='disabled'
+        )
+    editmenu.add_command(
+        label="Cut       Ctrl+X",
+        command=lambda: editor.current_tab().textbox.event_generate("<<Cut>>"),
+        state='disabled'
+    )
+    editmenu.add_command(
+        label="Paste    Ctrl+V",
+        command=lambda:
+        editor.current_tab().textbox.event_generate("<<Paste>>"),
+        state='normal'
+        )
+    editmenu.add_command(
+        label="Delete   Del",
+        command=lambda:
+        editor.current_tab().textbox.delete(tk.SEL_FIRST, tk.SEL_LAST),
+        state='disabled'
+        )
+    menubar.add_cascade(label="Edit", menu=editmenu)
+    root.config(menu=menubar)
+
+    # Bind text Selection event to update menu state
+    editor.current_tab().textbox.bind("<<Selection>>",
+                                      lambda event:
+                                      update_edit_menu_state(editor, editmenu)
+                                      )
+
+    # File Menu Keyboard bindings
     root.bind_all("<Control-n>", lambda event: new_file(editor))
     root.bind_all("<Control-o>", lambda event: open_file(editor))
     root.bind_all("<Control-s>", lambda event: save_file(editor))
@@ -99,3 +141,17 @@ def close_tab(editor):
 
 def exit_editor(root):
     root.quit()
+
+
+def update_edit_menu_state(editor, editmenu):
+    """Update state of Copy, Cut, and Delete menu items
+       based on text selection
+    """
+    if editor.current_tab().textbox.tag_ranges(tk.SEL):
+        editmenu.entryconfig(2, state='normal')  # Index 2 corresponds to Copy
+        editmenu.entryconfig(3, state='normal')  # Index 3 corresponds to Cut
+        editmenu.entryconfig(5, state='normal')  # Index 5 corr to Delete
+    else:
+        editmenu.entryconfig(2, state='disabled')  # Index 2 corr to Copy
+        editmenu.entryconfig(3, state='disabled')  # Index 3 corresponds to Cut
+        editmenu.entryconfig(5, state='disabled')  # Index 5 corr to Delete
