@@ -6,7 +6,7 @@ from tkinter import ttk
 import os
 from PIL import Image, ImageTk
 from hashlib import md5
-from menu_option import create_menu
+from menu_file import create_menu
 
 
 class Tab(ttk.Frame):
@@ -98,8 +98,13 @@ class TextEditorBase(ttk.Notebook):
 
     def add_tab(self):
         """Add a new tab to the Notebook"""
-        tab = Tab(self)
-        self.add(tab, text=f"Tab {self.index('end')}")
+        # Create initial tab with text 'Untitled'
+        initial_tab = Tab(self, FileDir='Untitled')
+        self.add(initial_tab, text='Untitled')
+
+        # Create 'Add' tab with text '+'
+        add_tab = Tab(self, FileDir='f')
+        self.add(add_tab, text=' + ')
 
 
 def run():
