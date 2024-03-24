@@ -3,6 +3,7 @@
 
 from tkinter import filedialog
 import tkinter as tk
+from tkinter import ttk
 
 
 def create_menu(root, editor):
@@ -62,6 +63,12 @@ def create_menu(root, editor):
         editor.current_tab().textbox.delete(tk.SEL_FIRST, tk.SEL_LAST),
         state='disabled'
         )
+    editmenu.add_separator()
+    editmenu.add_command(
+        label="Explain with chatGPT",
+        command=lambda:
+        editor.current_tab().explain_with_chatgpt(editor)
+    )
     menubar.add_cascade(label="Edit", menu=editmenu)
     root.config(menu=menubar)
 
@@ -70,6 +77,15 @@ def create_menu(root, editor):
                                       lambda event:
                                       update_edit_menu_state(editor, editmenu)
                                       )
+
+    # View Menu
+    viewmenu = tk.Menu(menubar, tearoff=0)
+    viewmenu.add_command(label="Zoom", command=lambda: zoom(editor))
+    viewmenu.add_checkbutton(label="Status Bar",
+                             command=lambda: toggle_status_bar(editor))
+    viewmenu.add_checkbutton(label="Word Wrap",
+                             command=lambda: toggle_word_wrap(editor))
+    menubar.add_cascade(label="View", menu=viewmenu)
 
     # File Menu Keyboard bindings
     root.bind_all("<Control-n>", lambda event: new_file(editor))
@@ -155,3 +171,48 @@ def update_edit_menu_state(editor, editmenu):
         editmenu.entryconfig(2, state='disabled')  # Index 2 corr to Copy
         editmenu.entryconfig(3, state='disabled')  # Index 3 corresponds to Cut
         editmenu.entryconfig(5, state='disabled')  # Index 5 corr to Delete
+
+
+def zoom(editor):
+    """Implement Zoom functionality"""
+    current_font = editor.current_tab().textbox['font']
+    current_size = int(current_font.split()[1])
+    new_size = current_size + 2  # Increase font size by 2 points
+    editor.current_tab().textbox['font'] = (current_font.split()[0], new_size)
+
+
+def toggle_status_bar(editor):
+    """Toggle the status bar"""
+    if hasattr(editor, 'status_bar'):
+        # Toggle status bar visibility
+        if editor.status_bar.winfo_ismapped():
+            editor.status_bar.pack_forget()
+        else:
+            editor.status_bar.pack(side='bottom', fill='x')
+    else:
+        # Create status bar if it doesn't exist
+        editor.status_bar = create_status_bar(editor)
+        editor.status_bar.pack(side='bottom', fill='x')
+
+
+def toggle_word_wrap(editor):
+    """Toggle word wrap"""
+    current_value = editor.current_tab().textbox.cget('wrap')
+    new_value = 'none' if current_value == 'word' else 'word'
+    editor.current_tab().textbox.configure(wrap=new_value)
+
+
+def create_status_bar(editor):
+    """Create Status bar"""
+    status_bar = ttk.Label(
+        editor,
+        text="Line: 1, Column: 1 | Total Characters: 0 | "
+        "Zoom Size: 100% | Encoding: utf-8")
+    return status_bar
+
+
+def explain_with_chatgpt(editor):
+    """Function that takes file content as chatgpt prompt and
+       appends the response to the text file
+    """
+    pass
