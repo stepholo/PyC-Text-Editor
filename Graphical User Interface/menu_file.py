@@ -4,8 +4,7 @@
 from tkinter import filedialog
 import tkinter as tk
 from tkinter import ttk
-import subprocess
-# import os
+import os
 
 
 def create_menu(root, editor):
@@ -117,6 +116,10 @@ def open_file(editor):
         tab = editor.current_tab()
         tab.textbox.delete('1.0', tk.END)
         tab.textbox.insert('1.0', content)
+        # Update tab name to reflect the file name
+        tab.file_dir = file_path
+        tab.file_name = os.path.basename(file_path)
+        editor.tab(editor.select(), text=tab.file_name)
 
 
 def save_file(editor):

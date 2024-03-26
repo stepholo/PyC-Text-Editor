@@ -1,25 +1,13 @@
+// Import required modules
 const axios = require('axios');
 const fs = require('fs');
-const path = require('path');
-
-// Function to read the content of a text file
-function readFile(filePath) {
-    return new Promise((resolve, reject) => {
-        fs.readFile(filePath, 'utf8', (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(data);
-            }
-        });
-    });
-}
 
 // Main function to interact with the OpenAI API
-async function interactWithOpenAI(filePath) {
+async function interactWithOpenAI(fileContent, filePath) {
+    console.log("Received input data:");
+    console.log("File Content:", fileContent);
+    console.log("File Path:", filePath);
     try {
-        // Read the content of the text file
-        const prompt = await readFile(filePath);
 
         // Request configuration for the OpenAI API
         const config = {
@@ -27,11 +15,11 @@ async function interactWithOpenAI(filePath) {
             url: 'https://api.openai.com/v1/completions',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer YOUR_API_KEY' // Replace YOUR_API_KEY with your actual API key
+                'Authorization': 'Bearer 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'
             },
             data: {
                 model: 'text-davinci-002', // Choose the appropriate model
-                prompt: prompt,
+                prompt: fileContent,
                 max_tokens: 150 // Adjust as needed
             }
         };
@@ -39,27 +27,23 @@ async function interactWithOpenAI(filePath) {
         // Send the request to the OpenAI API
         const response = await axios(config);
 
-        // Print the response from the API
-        console.log(response.data.choices[0].text.trim());
+        // Append the response to the same file
+        fs.appendFileSync(filePath, "\n\nChatGPT Response:\n" + response.data.choices[0].text.trim() + "\n");
     } catch (error) {
         console.error('Error:', error.message);
     }
 }
 
-// Extract the file path from command-line arguments
-/*const filePath = process.argv[2];
+// Export the function to make it accessible from Python
+module.exports = {
+    interactWithOpenAI
+};
 
-// Check if file path is provided
-if (!filePath) {
-    console.error('File path not provided.');
-    process.exit(1);
+// Check if this script is executed from command line
+if (require.main === module) {
+    // Extracting command line arguments
+    const [, , fileContent, filePath] = process.argv;
+
+    // Call the main function with provided arguments
+    interactWithOpenAI(fileContent, filePath);
 }
-
-// Check if the file exists
-if (!fs.existsSync(filePath)) {
-    console.error('File does not exist.');
-    process.exit(1);
-}
-
-// Call the main function to interact with the OpenAI API
-interactWithOpenAI(filePath);*/
