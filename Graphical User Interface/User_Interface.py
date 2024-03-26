@@ -8,6 +8,7 @@ from PIL import Image, ImageTk
 from hashlib import md5
 from menu_file import create_menu
 import subprocess
+import json
 
 
 class Tab(ttk.Frame):
@@ -61,25 +62,40 @@ class Tab(ttk.Frame):
             print("No file is open.")
             return
 
-        # Execute the Node.js script passing the file path as an argument
-        node_path = r"C:\Users\LENOVO\Desktop\PyC-Text-Editor-1\gpt-api\chatgpt.js"
-        process = subprocess.Popen(['node', node_path, file_path],
+        # Read the content of the file
+        with open(file_path, 'r') as file:
+            file_content = file.read()
+
+        # Prepare data to send to Node.js script
+        data = {
+            'fileContent': file_content,
+            'filePath': file_path
+            }
+
+        # Execute the Node.js script passing the file content and file path
+        # as arguments
+        path = r"C:\Users\LENOVO\Desktop\PyC-Text-Editor-1\gpt-api\chatgpt.js"
+        process = subprocess.Popen(['node', path, file_content, file_path],
+                                   stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE
                                    )
+
+        # Send data to the Node.js script
+        process.stdin.write(json.dumps(data).encode())
+        process.stdin.close()
+
+        # Get the response from the Node.js script
         stdout, stderr = process.communicate()
 
         # Check if there was an error in executing the Node.js script
         if stderr:
             print("Error executing Node.js script:", stderr.decode())
-            return
+            return None
 
-        # Append the response to the text file
-        response = stdout.decode().strip()
-        with open(file_path, "a") as file:
-            file.write("\n\nChatGPT Response:\n")
-            file.write(response)
-            file.write("\n")
+        # Process the response from Node.js if needed
+        response_data = stdout.decode().strip()
+        print(response_data)
 
 
 class TextEditorBase(ttk.Notebook):
