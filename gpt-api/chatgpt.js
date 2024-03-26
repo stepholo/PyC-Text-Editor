@@ -15,7 +15,7 @@ async function interactWithOpenAI(fileContent, filePath) {
             url: 'https://api.openai.com/v1/completions',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer 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'
+                'Authorization': 'Bearer OpenAI API'
             },
             data: {
                 model: 'text-davinci-002', // Choose the appropriate model
