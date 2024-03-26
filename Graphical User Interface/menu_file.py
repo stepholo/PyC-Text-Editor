@@ -4,11 +4,8 @@
 from tkinter import filedialog
 import tkinter as tk
 from tkinter import ttk
-import ctypes
-
-path = r"C:\Users\LENOVO\Desktop\PyC-Text-Editor-1\file management"
-
-lib = ctypes.CDLL(f"{path}\\libsearch.so")  # Change this to your library name
+import subprocess
+# import os
 
 
 def create_menu(root, editor):
@@ -74,12 +71,6 @@ def create_menu(root, editor):
         command=lambda:
         editor.current_tab().explain_with_chatgpt(editor)
     )
-    editmenu.add_separator()
-    editmenu.add_command(label="Find", command=find(editor))
-    '''editmenu.add_command(label="Find Next", command=find_next)
-    editmenu.add_command(label="Find Prev", command=find_prev)
-    editmenu.add_command(label="Replace", command=replace)
-    editmenu.add_command(label="Go To", command=go_to)'''
     menubar.add_cascade(label="Edit", menu=editmenu)
     root.config(menu=menubar)
 
@@ -170,49 +161,6 @@ def exit_editor(root):
     root.quit()
 
 
-def find(editor):
-    # Get the file content from the text editor
-    file_content = editor.current_tab().textbox.get('1.0', tk.END)
-
-    def find_action_wrapper(search_text):
-        find_action(search_text, file_content)
-
-    find_window = tk.Toplevel()
-    find_window.title("Find")
-    find_window.geometry("500x70")
-
-    label = tk.Label(find_window, text="Enter characters to find:")
-    label.pack()
-
-    entry = tk.Entry(find_window)
-    entry.pack()
-
-    find_button = tk.Button(find_window, text="Find",
-                            command=lambda: find_action_wrapper(entry.get()))
-    find_button.pack()
-
-
-def find_action(search_text, file_content):
-    lib.find(ctypes.c_char_p(search_text.encode()),
-             ctypes.c_char_p(file_content.encode()))
-
-
-'''def find_next():
-    lib.find_next()
-
-
-def find_prev():
-    lib.find_prev()
-
-
-def replace():
-    lib.replace()
-
-
-def go_to():
-    lib.go_to()'''
-
-
 def update_edit_menu_state(editor, editmenu):
     """Update state of Copy, Cut, and Delete menu items
        based on text selection
@@ -263,10 +211,3 @@ def create_status_bar(editor):
         text="Line: 1, Column: 1 | Total Characters: 0 | "
         "Zoom Size: 100% | Encoding: utf-8")
     return status_bar
-
-
-def explain_with_chatgpt(editor):
-    """Function that takes file content as chatgpt prompt and
-       appends the response to the text file
-    """
-    pass

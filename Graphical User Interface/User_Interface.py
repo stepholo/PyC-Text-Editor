@@ -7,6 +7,7 @@ import os
 from PIL import Image, ImageTk
 from hashlib import md5
 from menu_file import create_menu
+import subprocess
 
 
 class Tab(ttk.Frame):
@@ -44,6 +45,41 @@ class Tab(ttk.Frame):
         yscrollbar.config(command=textbox.yview)
 
         return textbox
+
+    def get_file_path(self):
+        return self.file_dir
+
+    def explain_with_chatgpt(self, editor):
+        """Function that takes file content as chatgpt prompt and
+        appends the response to the text file
+        """
+        # Get the path of the currently open file in the editor
+        file_path = editor.current_tab().get_file_path()
+
+        # Ensure the file path is not None
+        if file_path is None:
+            print("No file is open.")
+            return
+
+        # Execute the Node.js script passing the file path as an argument
+        node_path = r"C:\Users\LENOVO\Desktop\PyC-Text-Editor-1\gpt-api\chatgpt.js"
+        process = subprocess.Popen(['node', node_path, file_path],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE
+                                   )
+        stdout, stderr = process.communicate()
+
+        # Check if there was an error in executing the Node.js script
+        if stderr:
+            print("Error executing Node.js script:", stderr.decode())
+            return
+
+        # Append the response to the text file
+        response = stdout.decode().strip()
+        with open(file_path, "a") as file:
+            file.write("\n\nChatGPT Response:\n")
+            file.write(response)
+            file.write("\n")
 
 
 class TextEditorBase(ttk.Notebook):
