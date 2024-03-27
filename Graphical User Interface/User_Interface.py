@@ -6,7 +6,7 @@ from tkinter import ttk
 import os
 from PIL import Image, ImageTk
 from hashlib import md5
-from menu_file import create_menu, create_status_bar
+from menu_file import create_menu, create_status_bar, bind_right_click
 import subprocess
 import json
 
@@ -104,8 +104,8 @@ class Tab(ttk.Frame):
             return None
 
         # Process the response from Node.js if needed
-        response_data = stdout.decode().strip()
-        '''with open(file_path, 'a') as file:
+        '''response_data = stdout.decode().strip()
+        with open(file_path, 'a') as file:
             file.write(response_data)
         print(response_data)'''
 
@@ -189,6 +189,8 @@ def run():
 
     # Initialize status bar
     editor.status_bar = create_status_bar(editor)
+
+    bind_right_click(editor)
 
     root.mainloop()
 
