@@ -273,7 +273,7 @@ def toggle_word_wrap(editor):
         tab.textbox.configure(wrap=new_value)
 
 
-def right_click_menu(editor, event):
+'''def right_click_menu(editor, event):
     """Create and display a right-click context menu"""
     menu = tk.Menu(editor, tearoff=0)
     menu.add_command(
@@ -302,7 +302,7 @@ def right_click_menu(editor, event):
         label="Explain with ChatGPT", command=lambda:
         editor.current_tab().explain_with_chatgpt(editor))
 
-    menu.tk_popup(event.x_root, event.y_root)
+    menu.tk_popup(event.x_root, event.y_root)'''
 
 
 def bind_right_click(editor):
@@ -310,5 +310,20 @@ def bind_right_click(editor):
     for tab_id in editor.tabs():
         tab = editor.nametowidget(tab_id)
         tab.textbox.bind(
-            "<Button-3>", lambda event: right_click_menu(editor, event)
-            )
+            "<Button-3>", lambda event: editor.right_click_menu.post(event.x_root, event.y_root)
+        )
+        tab.textbox.bind(
+            "<ButtonRelease-3>", lambda event, tab=tab: update_right_click_menu_state(editor, tab)
+        )
+
+
+def update_right_click_menu_state(editor, tab):
+    """Update state of Copy, Cut, and Del menu items based on text selection"""
+    if tab.textbox.tag_ranges(tk.SEL):
+        editor.right_click_menu.entryconfig("Copy", state='normal')
+        editor.right_click_menu.entryconfig("Cut", state='normal')
+        editor.right_click_menu.entryconfig("Delete", state='normal')
+    else:
+        editor.right_click_menu.entryconfig("Copy", state='disabled')
+        editor.right_click_menu.entryconfig("Cut", state='disabled')
+        editor.right_click_menu.entryconfig("Delete", state='disabled')
