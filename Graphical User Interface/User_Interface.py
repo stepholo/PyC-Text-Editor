@@ -6,7 +6,7 @@ from tkinter import ttk
 import os
 from PIL import Image, ImageTk
 from hashlib import md5
-from menu_file import create_menu
+from menu_file import create_menu, create_status_bar
 import subprocess
 import json
 
@@ -16,11 +16,21 @@ class Tab(ttk.Frame):
     def __init__(self, *args, FileDir=None):
         ttk.Frame.__init__(self, *args)
         self.textbox = self.create_text_widget()
+        self.saved_content = None
         self.file_dir = None
         if FileDir:
             self.file_dir = FileDir
             self.file_name = os.path.basename(FileDir)
+            self.load_file_content()
         self.status = md5(self.textbox.get(1.0, 'end').encode('utf-8'))
+
+    def load_file_content(self):
+        """Load file content and set saved_content"""
+        if self.file_dir and os.path.exists(self.file_dir):
+            with open(self.file_dir, 'r') as file:
+                content = file.read()
+                self.textbox.insert('1.0', content)
+                self.saved_content = content  # Set saved_content
 
     def create_text_widget(self):
         # Horizontal Scroll Bar
@@ -96,8 +106,8 @@ class Tab(ttk.Frame):
         # Process the response from Node.js if needed
         response_data = stdout.decode().strip()
         '''with open(file_path, 'a') as file:
-            file.write(response_data)'''
-        print(response_data)
+            file.write(response_data)
+        print(response_data)'''
 
 
 class TextEditorBase(ttk.Notebook):
@@ -105,6 +115,9 @@ class TextEditorBase(ttk.Notebook):
     def __init__(self, *args, **kwargs):
         """Class construct"""
         super().__init__(*args, **kwargs)
+
+        # Initialize the status bar
+        self.status_bar = None
 
         # Add a default tab
         self.add_tab()
@@ -173,6 +186,9 @@ def run():
     editor.pack(fill="both", expand=True)
 
     create_menu(root, editor)
+
+    # Initialize status bar
+    editor.status_bar = create_status_bar(editor)
 
     root.mainloop()
 
