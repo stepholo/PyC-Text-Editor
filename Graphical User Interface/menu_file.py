@@ -134,11 +134,13 @@ def save_file(editor):
         with open(tab.file_dir, 'w') as file:
             file.write(content)
     else:  # File is being saved for the first time
-        if tab.file_name == 'Untitled' or tab.file_name is None:  # Check if the file name is 'Untitled' or None
+        if tab.file_name == 'Untitled' or tab.file_name is None:
             save_as(editor)
         else:
             # File has been renamed, save without opening file dialog
-            file_path = os.path.join(os.path.dirname(tab.file_dir), tab.file_name)
+            file_path = os.path.join(
+                os.path.dirname(tab.file_dir), tab.file_name
+                )
             content = tab.textbox.get('1.0', tk.END)
             with open(file_path, 'w') as file:
                 file.write(content)
@@ -232,6 +234,13 @@ def toggle_status_bar(editor):
         # Create status bar if it doesn't exist
         editor.status_bar = create_status_bar(editor)
         editor.status_bar.pack(side='bottom', fill='x')
+        # Apply status bar setting to all tabs
+    for tab_id in editor.tabs():
+        tab = editor.nametowidget(tab_id)
+        if editor.status_bar.winfo_ismapped():
+            tab.status_bar.pack(side='bottom', fill='x')
+        else:
+            tab.status_bar.pack_forget()
 
 
 def create_status_bar(editor):
@@ -257,3 +266,8 @@ def toggle_word_wrap(editor):
     current_value = editor.current_tab().textbox.cget('wrap')
     new_value = 'none' if current_value == 'word' else 'word'
     editor.current_tab().textbox.configure(wrap=new_value)
+
+    # Apply word wrap setting to all tabs
+    for tab_id in editor.tabs():
+        tab = editor.nametowidget(tab_id)
+        tab.textbox.configure(wrap=new_value)
