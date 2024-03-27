@@ -58,13 +58,13 @@ class Tab(ttk.Frame):
         file_path = editor.current_tab().get_file_path()
 
         # Ensure the file path is not None
-        if file_path is None:
+        if os.path.exists(file_path):
+            # Read the content of the file
+            with open(file_path, 'r') as file:
+                file_content = file.read()
+        else:
             print("No file is open.")
             return
-
-        # Read the content of the file
-        with open(file_path, 'r') as file:
-            file_content = file.read()
 
         # Prepare data to send to Node.js script
         data = {
@@ -95,6 +95,8 @@ class Tab(ttk.Frame):
 
         # Process the response from Node.js if needed
         response_data = stdout.decode().strip()
+        '''with open(file_path, 'a') as file:
+            file.write(response_data)'''
         print(response_data)
 
 
