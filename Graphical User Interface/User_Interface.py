@@ -183,10 +183,14 @@ class TextEditorBase(ttk.Notebook):
         self.right_click_menu.add_separator()
         self.right_click_menu.add_command(label="Copy", command=self.copy_text)
         self.right_click_menu.add_command(label="Cut", command=self.cut_text)
-        self.right_click_menu.add_command(label="Paste", command=self.paste_text)
-        self.right_click_menu.add_command(label="Delete", command=self.delete_text)
+        self.right_click_menu.add_command(
+            label="Paste", command=self.paste_text)
+        self.right_click_menu.add_command(
+            label="Delete", command=self.delete_text)
         self.right_click_menu.add_separator()
-        self.right_click_menu.add_command(label="Explain with chatgpt", command=lambda tab=current_tab: tab.explain_with_chatgpt(self))
+        self.right_click_menu.add_command(
+            label="Explain with chatgpt",
+            command=lambda tab=current_tab: tab.explain_with_chatgpt(self))
 
     # Function to undo text
     def undo_text(self):
