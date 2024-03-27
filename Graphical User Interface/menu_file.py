@@ -2,6 +2,7 @@
 """Module to define functions used for Menu options"""
 
 from tkinter import filedialog
+import tkinter.messagebox as messagebox
 import tkinter as tk
 from tkinter import ttk
 import os
@@ -81,12 +82,16 @@ def create_menu(root, editor):
 
     # View Menu
     viewmenu = tk.Menu(menubar, tearoff=0)
-    viewmenu.add_command(label="Zoom", command=lambda: zoom(editor))
     viewmenu.add_checkbutton(label="Status Bar",
                              command=lambda: toggle_status_bar(editor))
     viewmenu.add_checkbutton(label="Word Wrap",
                              command=lambda: toggle_word_wrap(editor))
     menubar.add_cascade(label="View", menu=viewmenu)
+
+    # Bind cursor movement event
+    editor.current_tab().textbox.bind(
+        "<Motion>", lambda event: update_status_bar(editor, editor.status_bar)
+        )
 
     # File Menu Keyboard bindings
     root.bind_all("<Control-n>", lambda event: new_file(editor))
@@ -124,12 +129,21 @@ def open_file(editor):
 
 def save_file(editor):
     tab = editor.current_tab()
-    if tab.file_dir:
+    if tab.file_dir:  # Check if file_dir is set (file has been saved before)
         content = tab.textbox.get('1.0', tk.END)
         with open(tab.file_dir, 'w') as file:
             file.write(content)
-    else:
-        save_as(editor)
+    else:  # File is being saved for the first time
+        if tab.file_name == 'Untitled' or tab.file_name is None:  # Check if the file name is 'Untitled' or None
+            save_as(editor)
+        else:
+            # File has been renamed, save without opening file dialog
+            file_path = os.path.join(os.path.dirname(tab.file_dir), tab.file_name)
+            content = tab.textbox.get('1.0', tk.END)
+            with open(file_path, 'w') as file:
+                file.write(content)
+            tab.file_dir = file_path  # Update file_dir with the new path
+            editor.tab(editor.select(), text=tab.file_name)  # Update tab name
 
 
 def save_as(editor):
@@ -139,6 +153,10 @@ def save_as(editor):
         content = tab.textbox.get('1.0', tk.END)
         with open(file_path, 'w') as file:
             file.write(content)
+        # Update tab attributes with new file information
+        tab.file_dir = file_path
+        tab.file_name = os.path.basename(file_path)
+        editor.tab(editor.select(), text=tab.file_name)
 
 
 def save_all(editor):
@@ -153,15 +171,39 @@ def save_all(editor):
 
 
 def close_tab(editor):
-    current_index = editor.index(editor.select())
-    if current_index != 0:
-        editor.forget(current_index)
+    current_tab = editor.current_tab()
+    if has_unsaved_changes(current_tab):
+        confirm_close = messagebox.askyesno(
+            "Unsaved Changes, "
+            "There are unsaved changes. "
+            "Do you want to save before closing?"
+            )
+        if confirm_close:
+            save_file(editor)
+        else:
+            editor.forget(editor.select())
     else:
-        exit_editor(editor)
+        editor.forget(editor.select())
 
 
 def exit_editor(root):
-    root.quit()
+    current_tab = root.current_tab()
+    if has_unsaved_changes(current_tab):
+        confirm_close = messagebox.askyesno(
+            "Unsaved Changes, "
+            "There are unsaved changes. "
+            "Do you want to save before exiting?"
+            )
+        if confirm_close:
+            save_all(root)
+        root.quit()
+    else:
+        root.quit()
+
+
+def has_unsaved_changes(tab):
+    content = tab.textbox.get("1.0", "end-1c")
+    return content != tab.saved_content
 
 
 def update_edit_menu_state(editor, editmenu):
@@ -178,17 +220,9 @@ def update_edit_menu_state(editor, editmenu):
         editmenu.entryconfig(5, state='disabled')  # Index 5 corr to Delete
 
 
-def zoom(editor):
-    """Implement Zoom functionality"""
-    current_font = editor.current_tab().textbox['font']
-    current_size = int(current_font.split()[1])
-    new_size = current_size + 2  # Increase font size by 2 points
-    editor.current_tab().textbox['font'] = (current_font.split()[0], new_size)
-
-
 def toggle_status_bar(editor):
     """Toggle the status bar"""
-    if hasattr(editor, 'status_bar'):
+    if editor.status_bar:
         # Toggle status bar visibility
         if editor.status_bar.winfo_ismapped():
             editor.status_bar.pack_forget()
@@ -200,17 +234,26 @@ def toggle_status_bar(editor):
         editor.status_bar.pack(side='bottom', fill='x')
 
 
-def toggle_word_wrap(editor):
-    """Toggle word wrap"""
-    current_value = editor.current_tab().textbox.cget('wrap')
-    new_value = 'none' if current_value == 'word' else 'word'
-    editor.current_tab().textbox.configure(wrap=new_value)
-
-
 def create_status_bar(editor):
     """Create Status bar"""
     status_bar = ttk.Label(
         editor,
         text="Line: 1, Column: 1 | Total Characters: 0 | "
-        "Zoom Size: 100% | Encoding: utf-8")
+        "Encoding: utf-8"
+    )
     return status_bar
+
+
+def update_status_bar(editor, status_bar):
+    cursor_pos = editor.current_tab().textbox.index(tk.INSERT)
+    line, column = map(int, cursor_pos.split('.'))
+    total_char = len(editor.current_tab().textbox.get('1.0', tk.END))
+    status_text = f"Line: {line}, Column: {column} | Total Characters: {total_char} | Encoding: utf-8"
+    status_bar.config(text=status_text)
+
+
+def toggle_word_wrap(editor):
+    """Toggle word wrap"""
+    current_value = editor.current_tab().textbox.cget('wrap')
+    new_value = 'none' if current_value == 'word' else 'word'
+    editor.current_tab().textbox.configure(wrap=new_value)
