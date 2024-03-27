@@ -271,3 +271,59 @@ def toggle_word_wrap(editor):
     for tab_id in editor.tabs():
         tab = editor.nametowidget(tab_id)
         tab.textbox.configure(wrap=new_value)
+
+
+'''def right_click_menu(editor, event):
+    """Create and display a right-click context menu"""
+    menu = tk.Menu(editor, tearoff=0)
+    menu.add_command(
+        label="Undo", command=lambda:
+        editor.current_tab().textbox.edit_undo())
+    menu.add_separator()
+    menu.add_command(
+        label="Cut", command=lambda:
+        editor.current_tab().textbox.event_generate("<<Cut>>"))
+    menu.add_command(
+        label="Copy", command=lambda:
+        editor.current_tab().textbox.event_generate("<<Copy>>"))
+    menu.add_command(
+        label="Paste", command=lambda:
+        editor.current_tab().textbox.event_generate("<<Paste>>"))
+    menu.add_separator()
+    menu.add_command(
+        label="Delete", command=lambda:
+        editor.current_tab().textbox.delete(tk.SEL_FIRST, tk.SEL_LAST))
+    menu.add_separator()
+    menu.add_command(
+        label="Select All", command=lambda:
+        editor.current_tab().textbox.tag_add(tk.SEL, "1.0", tk.END))
+    menu.add_separator()
+    menu.add_command(
+        label="Explain with ChatGPT", command=lambda:
+        editor.current_tab().explain_with_chatgpt(editor))
+
+    menu.tk_popup(event.x_root, event.y_root)'''
+
+
+def bind_right_click(editor):
+    """Bind right-click context menu to the text widget"""
+    for tab_id in editor.tabs():
+        tab = editor.nametowidget(tab_id)
+        tab.textbox.bind(
+            "<Button-3>", lambda event: editor.right_click_menu.post(event.x_root, event.y_root)
+        )
+        tab.textbox.bind(
+            "<ButtonRelease-3>", lambda event, tab=tab: update_right_click_menu_state(editor, tab)
+        )
+
+
+def update_right_click_menu_state(editor, tab):
+    """Update state of Copy, Cut, and Del menu items based on text selection"""
+    if tab.textbox.tag_ranges(tk.SEL):
+        editor.right_click_menu.entryconfig("Copy", state='normal')
+        editor.right_click_menu.entryconfig("Cut", state='normal')
+        editor.right_click_menu.entryconfig("Delete", state='normal')
+    else:
+        editor.right_click_menu.entryconfig("Copy", state='disabled')
+        editor.right_click_menu.entryconfig("Cut", state='disabled')
+        editor.right_click_menu.entryconfig("Delete", state='disabled')

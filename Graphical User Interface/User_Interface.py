@@ -6,7 +6,7 @@ from tkinter import ttk
 import os
 from PIL import Image, ImageTk
 from hashlib import md5
-from menu_file import create_menu, create_status_bar
+from menu_file import create_menu, create_status_bar, bind_right_click
 import subprocess
 import json
 
@@ -104,8 +104,8 @@ class Tab(ttk.Frame):
             return None
 
         # Process the response from Node.js if needed
-        response_data = stdout.decode().strip()
-        '''with open(file_path, 'a') as file:
+        '''response_data = stdout.decode().strip()
+        with open(file_path, 'a') as file:
             file.write(response_data)
         print(response_data)'''
 
@@ -141,6 +141,9 @@ class TextEditorBase(ttk.Notebook):
         # Counter for untitled files
         self.untitled_count = 1
 
+        # Create right-click context menu
+        self.right_click_menu()
+
     # Get the object of the current tab
     def current_tab(self):
         return self.nametowidget(self.select())
@@ -173,6 +176,38 @@ class TextEditorBase(ttk.Notebook):
         add_tab = Tab(self, FileDir='f')
         self.add(add_tab, text=' + ')
 
+    def right_click_menu(self):
+        current_tab = self.current_tab()
+        self.right_click_menu = tk.Menu(self, tearoff=0)
+        self.right_click_menu.add_command(label="Undo", command=self.undo_text)
+        self.right_click_menu.add_separator()
+        self.right_click_menu.add_command(label="Copy", command=self.copy_text)
+        self.right_click_menu.add_command(label="Cut", command=self.cut_text)
+        self.right_click_menu.add_command(label="Paste", command=self.paste_text)
+        self.right_click_menu.add_command(label="Delete", command=self.delete_text)
+        self.right_click_menu.add_separator()
+        self.right_click_menu.add_command(label="Explain with chatgpt", command=lambda tab=current_tab: tab.explain_with_chatgpt(self))
+
+    # Function to undo text
+    def undo_text(self):
+        self.current_tab().textbox.event_generate("<<Undo>>")
+
+    # Function to copy text
+    def copy_text(self):
+        self.current_tab().textbox.event_generate("<<Copy>>")
+
+    # Function to cut text
+    def cut_text(self):
+        self.current_tab().textbox.event_generate("<<Cut>>")
+
+    # Function to paste text
+    def paste_text(self):
+        self.current_tab().textbox.event_generate("<<Paste>>")
+
+    # Function to delete text
+    def delete_text(self):
+        self.current_tab().textbox.delete(tk.SEL_FIRST, tk.SEL_LAST)
+
 
 def run():
     """Run the windows"""
@@ -189,6 +224,8 @@ def run():
 
     # Initialize status bar
     editor.status_bar = create_status_bar(editor)
+
+    bind_right_click(editor)
 
     root.mainloop()
 
