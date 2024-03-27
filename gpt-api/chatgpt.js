@@ -4,9 +4,9 @@ const fs = require('fs');
 
 // Main function to interact with the OpenAI API
 async function interactWithOpenAI(fileContent, filePath) {
-    console.log("Received input data:");
-    console.log("File Content:", fileContent);
-    console.log("File Path:", filePath);
+    // console.log("Received input data:");
+    // console.log("File Content:", fileContent);
+    // console.log("File Path:", filePath);
     try {
 
         // Request configuration for the OpenAI API
@@ -15,7 +15,7 @@ async function interactWithOpenAI(fileContent, filePath) {
             url: 'https://api.openai.com/v1/completions',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer OpenAI API'
+                'Authorization': 'Bearer Your-API-Key'
             },
             data: {
                 model: 'text-davinci-002', // Choose the appropriate model
@@ -30,7 +30,9 @@ async function interactWithOpenAI(fileContent, filePath) {
         // Append the response to the same file
         fs.appendFileSync(filePath, "\n\nChatGPT Response:\n" + response.data.choices[0].text.trim() + "\n");
     } catch (error) {
-        console.error('Error:', error.message);
+        // console.error('Error:', error.message);
+        fs.appendFileSync(filePath, "\n\nChatGPT Response:\n" + error.message)
+
     }
 }
 
