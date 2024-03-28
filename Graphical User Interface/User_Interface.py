@@ -42,7 +42,8 @@ class Tab(ttk.Frame):
         yscrollbar.pack(side='right', fill='y')
 
         # Create Text Editor Box
-        textbox = tk.Text(self, font=('Times New Roman', 12), relief='sunken',
+        default_font = ('Times New Roman', 12)
+        textbox = tk.Text(self, font=default_font, relief='sunken',
                           borderwidth=0, wrap='none')
         textbox.config(xscrollcommand=xscrollbar.set,
                        yscrollcommand=yscrollbar.set, undo=True,
@@ -104,10 +105,8 @@ class Tab(ttk.Frame):
             return None
 
         # Process the response from Node.js if needed
-        '''response_data = stdout.decode().strip()
-        with open(file_path, 'a') as file:
-            file.write(response_data)
-        print(response_data)'''
+        response_data = stdout.decode().strip()
+        self.textbox.insert('end', f'\n\nChatGPT Response:\n{response_data}')
 
 
 class TextEditorBase(ttk.Notebook):

@@ -80,6 +80,29 @@ def create_menu(root, editor):
                                       update_edit_menu_state(editor, editmenu)
                                       )
 
+    # Add font and font size options
+    font_menu = tk.Menu(editmenu, tearoff=0)
+    font_menu.add_command(label="Arial",
+                          command=lambda: change_font(editor, "Arial"))
+    font_menu.add_command(
+        label="Times New Roman",
+        command=lambda: change_font(editor, "Times New Roman"))
+    font_menu.add_command(label="Courier New",
+                          command=lambda: change_font(editor, "Courier New"))
+    editmenu.add_cascade(label="Font", menu=font_menu)
+
+    font_size_menu = tk.Menu(editmenu, tearoff=0)
+    font_size_menu.add_command(label="10",
+                               command=lambda: change_font_size(editor, 10))
+    font_size_menu.add_command(label="12",
+                               command=lambda: change_font_size(editor, 12))
+    font_size_menu.add_command(label="14",
+                               command=lambda: change_font_size(editor, 14))
+    editmenu.add_cascade(label="Font Size", menu=font_size_menu)
+
+    # menubar.add_cascade(label="Edit", menu=editmenu)
+    # root.config(menu=menubar)
+
     # View Menu
     viewmenu = tk.Menu(menubar, tearoff=0)
     viewmenu.add_checkbutton(label="Status Bar",
@@ -103,6 +126,27 @@ def create_menu(root, editor):
     root.bind_all("<Control-w>", lambda event: close_tab(editor))
     root.bind_all("<Control-Shift-W>", lambda event: close_window(editor))
     root.bind_all("<Control-q>", lambda event: exit_editor(root))
+
+
+def change_font(editor, font_name):
+    current_tab = editor.current_tab()
+    current_font = current_tab.textbox['font']
+    current_font = current_font.split()[:]
+    # print("Current Font:", current_font)
+    if len(current_font) == 4:
+        current_font_size = current_font[3]
+    elif len(current_font) == 3:
+        current_font_size = current_font[2]
+    else:
+        current_font_size = current_font[1]
+    current_tab.textbox.config(font=(font_name, current_font_size))
+
+
+def change_font_size(editor, font_size):
+    current_tab = editor.current_tab()
+    current_font = current_tab.textbox['font']
+    current_font_name = ' '.join(current_font.split()[1:])  # Extract font name
+    current_tab.textbox.config(font=(current_font_name, font_size))
 
 
 def close_window(root):
@@ -257,8 +301,8 @@ def update_status_bar(editor, status_bar):
     cursor_pos = editor.current_tab().textbox.index(tk.INSERT)
     line, column = map(int, cursor_pos.split('.'))
     total_char = len(editor.current_tab().textbox.get('1.0', tk.END))
-    status_text = f"Line: {line}, Column: {column} | Total Characters: {total_char} | Encoding: utf-8"
-    status_bar.config(text=status_text)
+    text = f"Line: {line}, Column: {column} | Total Characters: {total_char}"
+    status_bar.config(text=text)
 
 
 def toggle_word_wrap(editor):
@@ -273,47 +317,17 @@ def toggle_word_wrap(editor):
         tab.textbox.configure(wrap=new_value)
 
 
-'''def right_click_menu(editor, event):
-    """Create and display a right-click context menu"""
-    menu = tk.Menu(editor, tearoff=0)
-    menu.add_command(
-        label="Undo", command=lambda:
-        editor.current_tab().textbox.edit_undo())
-    menu.add_separator()
-    menu.add_command(
-        label="Cut", command=lambda:
-        editor.current_tab().textbox.event_generate("<<Cut>>"))
-    menu.add_command(
-        label="Copy", command=lambda:
-        editor.current_tab().textbox.event_generate("<<Copy>>"))
-    menu.add_command(
-        label="Paste", command=lambda:
-        editor.current_tab().textbox.event_generate("<<Paste>>"))
-    menu.add_separator()
-    menu.add_command(
-        label="Delete", command=lambda:
-        editor.current_tab().textbox.delete(tk.SEL_FIRST, tk.SEL_LAST))
-    menu.add_separator()
-    menu.add_command(
-        label="Select All", command=lambda:
-        editor.current_tab().textbox.tag_add(tk.SEL, "1.0", tk.END))
-    menu.add_separator()
-    menu.add_command(
-        label="Explain with ChatGPT", command=lambda:
-        editor.current_tab().explain_with_chatgpt(editor))
-
-    menu.tk_popup(event.x_root, event.y_root)'''
-
-
 def bind_right_click(editor):
     """Bind right-click context menu to the text widget"""
     for tab_id in editor.tabs():
         tab = editor.nametowidget(tab_id)
         tab.textbox.bind(
-            "<Button-3>", lambda event: editor.right_click_menu.post(event.x_root, event.y_root)
+            "<Button-3>", lambda event:
+            editor.right_click_menu.post(event.x_root, event.y_root)
         )
         tab.textbox.bind(
-            "<ButtonRelease-3>", lambda event, tab=tab: update_right_click_menu_state(editor, tab)
+            "<ButtonRelease-3>", lambda event,
+            tab=tab: update_right_click_menu_state(editor, tab)
         )
 
 
