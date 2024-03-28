@@ -216,7 +216,7 @@ def run():
     """Run the windows"""
     root = tk.Tk()
     root.title('PyC Text Editor')
-    root.geometry('800x500')
+    root.geometry('1500x600')
     root.resizable(1, 1)
 
     # Notebook widget to manage multiple tabs
