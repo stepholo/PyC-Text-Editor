@@ -125,7 +125,7 @@ def create_menu(root, editor):
     root.bind_all("<Control-a>", lambda event: save_all(editor))
     root.bind_all("<Control-w>", lambda event: close_tab(editor))
     root.bind_all("<Control-Shift-W>", lambda event: close_window(editor))
-    root.bind_all("<Control-q>", lambda event: exit_editor(root))
+    root.bind_all("<Control-q>", lambda event: exit_editor(editor))
 
 
 def change_font(editor, font_name):
@@ -232,8 +232,8 @@ def close_tab(editor):
         editor.forget(editor.select())
 
 
-def exit_editor(root):
-    current_tab = root.current_tab()
+def exit_editor(editor):
+    current_tab = editor.current_tab()
     if has_unsaved_changes(current_tab):
         confirm_close = messagebox.askyesno(
             "Unsaved Changes, "
@@ -241,10 +241,10 @@ def exit_editor(root):
             "Do you want to save before exiting?"
             )
         if confirm_close:
-            save_all(root)
-        root.quit()
+            save_all(editor)
+        editor.quit()
     else:
-        root.quit()
+        editor.quit()
 
 
 def has_unsaved_changes(tab):
@@ -283,8 +283,8 @@ def toggle_status_bar(editor):
         tab = editor.nametowidget(tab_id)
         if editor.status_bar.winfo_ismapped():
             tab.status_bar.pack(side='bottom', fill='x')
-        else:
-            tab.status_bar.pack_forget()
+        # else:
+            # tab.status_bar.pack_forget()
 
 
 def create_status_bar(editor):
@@ -303,6 +303,13 @@ def update_status_bar(editor, status_bar):
     total_char = len(editor.current_tab().textbox.get('1.0', tk.END))
     text = f"Line: {line}, Column: {column} | Total Characters: {total_char}"
     status_bar.config(text=text)
+
+
+def bind_status_bar_update(editor):
+    """Bind cursor movement event to update status bar"""
+    editor.textbox.bind(
+        "<Motion>", lambda event: editor.update_status_bar()
+    )
 
 
 def toggle_word_wrap(editor):

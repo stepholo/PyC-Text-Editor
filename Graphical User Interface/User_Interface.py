@@ -18,6 +18,7 @@ class Tab(ttk.Frame):
         self.textbox = self.create_text_widget()
         self.saved_content = None
         self.file_dir = None
+        self.status_bar = None
         if FileDir:
             self.file_dir = FileDir
             self.file_name = os.path.basename(FileDir)
@@ -216,7 +217,7 @@ def run():
     """Run the windows"""
     root = tk.Tk()
     root.title('PyC Text Editor')
-    root.geometry('800x500')
+    root.geometry('1500x600')
     root.resizable(1, 1)
 
     # Notebook widget to manage multiple tabs
