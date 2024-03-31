@@ -18,6 +18,7 @@ class Tab(ttk.Frame):
         self.textbox = self.create_text_widget()
         self.saved_content = None
         self.file_dir = None
+        self.status_bar = None
         if FileDir:
             self.file_dir = FileDir
             self.file_name = os.path.basename(FileDir)
