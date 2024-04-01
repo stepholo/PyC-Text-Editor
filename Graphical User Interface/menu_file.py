@@ -9,6 +9,7 @@ import os
 
 
 def create_menu(root, editor):
+    """Function to create menu tools for the text editor"""
     menubar = tk.Menu(root)
 
     # File Menu
@@ -129,6 +130,7 @@ def create_menu(root, editor):
 
 
 def change_font(editor, font_name):
+    """Function that changes font type"""
     current_tab = editor.current_tab()
     current_font = current_tab.textbox['font']
     current_font = current_font.split()[:]
@@ -143,6 +145,7 @@ def change_font(editor, font_name):
 
 
 def change_font_size(editor, font_size):
+    """Function that changes font size"""
     current_tab = editor.current_tab()
     current_font = current_tab.textbox['font']
     current_font_name = ' '.join(current_font.split()[1:])  # Extract font name
@@ -150,14 +153,17 @@ def change_font_size(editor, font_size):
 
 
 def close_window(root):
+    """Function to close text editor window"""
     root.destroy()
 
 
 def new_file(editor):
+    """Function to add new tab"""
     editor.add_tab()
 
 
 def open_file(editor):
+    """Function to open an existing file"""
     file_path = filedialog.askopenfilename()
     if file_path:
         with open(file_path, 'r') as file:
@@ -172,6 +178,7 @@ def open_file(editor):
 
 
 def save_file(editor):
+    """Function to save the characters inserted into the text editor"""
     tab = editor.current_tab()
     if tab.file_dir:  # Check if file_dir is set (file has been saved before)
         content = tab.textbox.get('1.0', tk.END)
@@ -193,6 +200,9 @@ def save_file(editor):
 
 
 def save_as(editor):
+    """Function to save an open file with a different name
+       in a different directory
+    """
     file_path = filedialog.asksaveasfilename(defaultextension=".txt")
     if file_path:
         tab = editor.current_tab()
@@ -206,6 +216,9 @@ def save_as(editor):
 
 
 def save_all(editor):
+    """Function that saves all the content of all the tabs
+       open in the text editor
+    """
     for tab_id in editor.tabs():
         tab = editor.nametowidget(tab_id)
         if tab.file_dir:
@@ -217,11 +230,11 @@ def save_all(editor):
 
 
 def close_tab(editor):
+    """Function to close the current tab"""
     current_tab = editor.current_tab()
     if has_unsaved_changes(current_tab):
         confirm_close = messagebox.askyesno(
             "Unsaved Changes, "
-            "There are unsaved changes. "
             "Do you want to save before closing?"
             )
         if confirm_close:
@@ -233,6 +246,7 @@ def close_tab(editor):
 
 
 def exit_editor(editor):
+    """Close the entire window of the text editor"""
     current_tab = editor.current_tab()
     if has_unsaved_changes(current_tab):
         confirm_close = messagebox.askyesno(
@@ -248,6 +262,7 @@ def exit_editor(editor):
 
 
 def has_unsaved_changes(tab):
+    """Checks whether an open tab has unsaved changes"""
     content = tab.textbox.get("1.0", "end-1c")
     return content != tab.saved_content
 
@@ -298,6 +313,7 @@ def create_status_bar(editor):
 
 
 def update_status_bar(editor, status_bar):
+    """Updates the status bar dynamically"""
     cursor_pos = editor.current_tab().textbox.index(tk.INSERT)
     line, column = map(int, cursor_pos.split('.'))
     total_char = len(editor.current_tab().textbox.get('1.0', tk.END))
