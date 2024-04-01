@@ -34,6 +34,7 @@ class Tab(ttk.Frame):
                 self.saved_content = content  # Set saved_content
 
     def create_text_widget(self):
+        """Implementations for the text widget"""
         # Horizontal Scroll Bar
         xscrollbar = tk.Scrollbar(self, orient='horizontal')
         xscrollbar.pack(side='bottom', fill='x')
@@ -144,11 +145,12 @@ class TextEditorBase(ttk.Notebook):
         # Create right-click context menu
         self.right_click_menu()
 
-    # Get the object of the current tab
     def current_tab(self):
+        """Get the object of the current tab"""
         return self.nametowidget(self.select())
 
     def indexed_tab(self, index):
+        """Get the index of the current tab"""
         return self.nametowidget(self.tabs()[index])
 
     # Move tab position by dragging tab
@@ -177,6 +179,7 @@ class TextEditorBase(ttk.Notebook):
         self.add(add_tab, text=' + ')
 
     def right_click_menu(self):
+        """Commands for right click menu"""
         current_tab = self.current_tab()
         self.right_click_menu = tk.Menu(self, tearoff=0)
         self.right_click_menu.add_command(label="Undo", command=self.undo_text)
@@ -192,24 +195,24 @@ class TextEditorBase(ttk.Notebook):
             label="Explain with chatgpt",
             command=lambda tab=current_tab: tab.explain_with_chatgpt(self))
 
-    # Function to undo text
     def undo_text(self):
+        """Function to undo text"""
         self.current_tab().textbox.event_generate("<<Undo>>")
 
-    # Function to copy text
     def copy_text(self):
+        """Function to copy text"""
         self.current_tab().textbox.event_generate("<<Copy>>")
 
-    # Function to cut text
     def cut_text(self):
+        """Function to cut text"""
         self.current_tab().textbox.event_generate("<<Cut>>")
 
-    # Function to paste text
     def paste_text(self):
+        """Function to paste text"""
         self.current_tab().textbox.event_generate("<<Paste>>")
 
-    # Function to delete text
     def delete_text(self):
+        """Function to delete text"""
         self.current_tab().textbox.delete(tk.SEL_FIRST, tk.SEL_LAST)
 
 
