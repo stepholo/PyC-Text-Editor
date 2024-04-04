@@ -175,8 +175,8 @@ class TextEditorBase(ttk.Notebook):
         self.add(initial_tab, text='Untitled')
 
         # Create 'Add' tab with text '+'
-        add_tab = Tab(self, FileDir='f')
-        self.add(add_tab, text=' + ')
+        # add_tab = Tab(self, FileDir='f')
+        # self.add(add_tab, text=' + ')
 
     def right_click_menu(self):
         """Commands for right click menu"""
