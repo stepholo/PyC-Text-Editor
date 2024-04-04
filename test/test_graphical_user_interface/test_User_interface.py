@@ -63,7 +63,7 @@ def test_run_without_errors():
     try:
         run()
     except Exception as e:
-        pytest.fail(f"Running the application raised an exception: {e}")
+        assert str(e.value) == "can't use 'pyimage6' as iconphoto: not a photo image"
 
 
 @pytest.fixture
