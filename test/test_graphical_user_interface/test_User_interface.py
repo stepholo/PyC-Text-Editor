@@ -9,20 +9,24 @@ import tempfile
 
 @pytest.fixture
 def text_editor():
+    """Test setup"""
     return TextEditorBase()
 
 
 def test_initial_tab_creation(text_editor):
+    """Test the first tab creation"""
     assert text_editor.index("end") == 2  # There should be two tabs initially
 
 
 def test_add_tab(text_editor):
+    """Test adding tab"""
     initial_tab_count = text_editor.index("end")
     text_editor.add_tab()
     assert text_editor.index("end") == initial_tab_count + 2
 
 
 def test_move_tab(text_editor):
+    """Test if tab can move"""
     # Add a few tabs
     for _ in range(5):
         text_editor.add_tab()
@@ -38,6 +42,7 @@ def test_move_tab(text_editor):
 
 
 def test_right_click_menu_creation(text_editor):
+    """Test right click menu"""
     # Access the right-click menu attribute
     right_click_menu = text_editor.right_click_menu
     # Check if the right-click menu is not None
@@ -45,6 +50,7 @@ def test_right_click_menu_creation(text_editor):
 
 
 def test_copy_cut_paste_text(text_editor):
+    """Test Copy, Cut and Paste"""
     # Insert some text
     text_editor.current_tab().textbox.insert('end', 'Hello, World!')
     # Copy the text
@@ -60,14 +66,17 @@ def test_copy_cut_paste_text(text_editor):
 
 
 def test_run_without_errors():
+    """Test run"""
     try:
         run()
     except Exception as e:
-        assert str(e.value) == "can't use 'pyimage6' as iconphoto: not a photo image"
+        strn = "can't use 'pyimage6' as iconphoto: not a photo image"
+        assert str(e.value) == strn
 
 
 @pytest.fixture
 def tab_with_file():
+    """Test setup"""
     # Create a temporary test file
     # Create a temporary file
     with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
@@ -86,16 +95,19 @@ def tab_with_file():
 
 
 def test_load_file_content(tab_with_file):
+    """Test load file content"""
     # Check if the content of the file is loaded into the text widget
     assert tab_with_file.textbox.get("1.0", "end-1c") == "Test content"
 
 
 def test_get_file_path(tab_with_file):
+    """Test file path of the file open in text editor"""
     # Check if the file path returned matches the path used to create the tab
     assert tab_with_file.get_file_path() is not None
 
 
 def test_explain_with_chatgpt(tab_with_file, monkeypatch):
+    """Test the communication between python and javascript"""
     # Mock subprocess.Popen to avoid actual execution of the Node.js script
     class MockProcess:
         def communicate(self):
