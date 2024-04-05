@@ -17,7 +17,7 @@ async function interactWithOpenAI(fileContent, filePath) {
         })
 
         // Append the response to the same file
-        fs.appendFileSync(filePath, "\nChatGPT Response:\n" + completion.choices[0].message.content + "\n\n User Response\n");
+        fs.appendFileSync(filePath, "\n\nChatGPT Response:\n" + completion.choices[0].message.content + "\n\n User Response\n");
     } catch (error) {
         // Append the error as well
         fs.appendFileSync(filePath, "\n\nChatGPT Response:\n" + error.message)
