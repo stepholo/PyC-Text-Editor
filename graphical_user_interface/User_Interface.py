@@ -6,7 +6,12 @@ from tkinter import ttk
 import os
 from PIL import Image, ImageTk
 from hashlib import md5
-from graphical_user_interface.menu_file import create_menu, create_status_bar, bind_right_click
+from menu_file import (
+    create_menu,
+    create_status_bar,
+    open_file,
+    bind_right_click
+)
 import subprocess
 import json
 
@@ -45,8 +50,12 @@ class Tab(ttk.Frame):
 
         # Create Text Editor Box
         default_font = ('Times New Roman', 12)
-        textbox = tk.Text(self, font=default_font, relief='sunken',
-                          borderwidth=0, wrap='none')
+        textbox = tk.Text(self, font=default_font, relief='flat',
+                          borderwidth=0, wrap='none',
+                          bg='white', fg='black',
+                          insertbackground='black', selectbackground='#B4D5FF',
+                          padx=10, pady=5, spacing1=3, spacing2=3, spacing3=3,
+                          undo=True, autoseparators=True)
         textbox.config(xscrollcommand=xscrollbar.set,
                        yscrollcommand=yscrollbar.set, undo=True,
                        autoseparators=True)
@@ -61,6 +70,7 @@ class Tab(ttk.Frame):
         return textbox
 
     def get_file_path(self):
+        """Returns the path of the file open in the text editor"""
         return self.file_dir
 
     def explain_with_chatgpt(self, editor):
@@ -108,7 +118,8 @@ class Tab(ttk.Frame):
 
         # Process the response from Node.js if needed
         response_data = stdout.decode().strip()
-        self.textbox.insert('end', f'\n\nChatGPT Response:\n{response_data}')
+        if response_data:
+            open_file(editor)
 
 
 class TextEditorBase(ttk.Notebook):
