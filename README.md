@@ -30,6 +30,9 @@ PyC Text Editor is a simple yet powerful text editor built using Python and tkin
 
 8. **Toggle Word Wrap**: Click on "View" menu and select "Word Wrap" to toggle word wrapping for long lines of text.
 
+   ![PyC Text Editor](https://github.com/stepholo/PyC-Text-Editor/blob/main/usage.png)
+
+
 ## Installation
 
 To run the PyC Text Editor, make sure you have Python 3 installed on your system along with the required dependencies listed in `requirements.txt`. You can install the dependencies using the following command:
