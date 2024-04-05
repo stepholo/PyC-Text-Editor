@@ -1,48 +1,32 @@
+#!/usr/bin/env node
+
 // Import required modules
-const axios = require('axios');
 const fs = require('fs');
+const { OpenAI } = require('openai');
+
+const openai = new OpenAI({ apiKey: 'YOUR API-KEY' });
 
 // Main function to interact with the OpenAI API
 async function interactWithOpenAI(fileContent, filePath) {
-    // console.log("Received input data:");
-    // console.log("File Content:", fileContent);
-    // console.log("File Path:", filePath);
     try {
 
         // Request configuration for the OpenAI API
-        const config = {
-            method: 'post',
-            url: 'https://api.openai.com/v1/completions',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer Your-API-Key'
-            },
-            data: {
-                model: 'text-davinci-002', // Choose the appropriate model
-                prompt: fileContent,
-                max_tokens: 150 // Adjust as needed
-            }
-        };
-
-        // Send the request to the OpenAI API
-        const response = await axios(config);
+        const completion = await openai.chat.completions.create({
+            messages: [{ role: "system", content: fileContent }],
+            model: "gpt-3.5-turbo"
+        })
 
         // Append the response to the same file
-        fs.appendFileSync(filePath, "\n\nChatGPT Response:\n" + response.data.choices[0].text.trim() + "\n");
+        fs.appendFileSync(filePath, "\nChatGPT Response:\n" + completion.choices[0].message.content + "\n\n User Response\n");
     } catch (error) {
-        // console.error('Error:', error.message);
+        // Append the error as well
         fs.appendFileSync(filePath, "\n\nChatGPT Response:\n" + error.message)
 
     }
 }
 
-// Export the function to make it accessible from Python
-module.exports = {
-    interactWithOpenAI
-};
-
 // Check if this script is executed from command line
-if (require.main === module) {
+if (require.main === module){
     // Extracting command line arguments
     const [, , fileContent, filePath] = process.argv;
 
