@@ -4,7 +4,7 @@
 const fs = require('fs');
 const { OpenAI } = require('openai');
 
-const openai = new OpenAI({ apiKey: 'YOUR API-KEY' });
+const openai = new OpenAI({ apiKey: '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' });
 
 // Main function to interact with the OpenAI API
 async function interactWithOpenAI(fileContent, filePath) {
@@ -17,7 +17,7 @@ async function interactWithOpenAI(fileContent, filePath) {
         })
 
         // Append the response to the same file
-        fs.appendFileSync(filePath, "\n\nChatGPT Response:\n" + completion.choices[0].message.content + "\n\n User Response\n");
+        fs.appendFileSync(filePath, "\nChatGPT Response:\n" + completion.choices[0].message.content + "\n\nUser Response\n");
     } catch (error) {
         // Append the error as well
         fs.appendFileSync(filePath, "\n\nChatGPT Response:\n" + error.message)
