@@ -4,7 +4,7 @@
 const fs = require('fs');
 const { OpenAI } = require('openai');
 
-const openai = new OpenAI({ apiKey: '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' });
+const openai = new OpenAI({ apiKey: '' });
 
 // Main function to interact with the OpenAI API
 async function interactWithOpenAI(fileContent, filePath) {
